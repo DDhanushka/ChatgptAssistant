@@ -1,12 +1,17 @@
-﻿public class Program
+﻿using ChatgptAssistant;
+
+public class Program
 {
     public static async Task Main(string[] args)
     {
         Console.WriteLine("======== Chatgpt Assistant ========");
 
+        AppSettings appSettings = Utils.GetAppSettings();
+
+
         while (true)
         {
-            DisplayMenu();
+            DisplayMenu(appSettings);
 
             // Get user input
             Console.Write("Enter your choice (1-4, or 'x' to exit): ");
@@ -22,13 +27,17 @@
             ProcessUserInput(userInput);
         }
     }
-    private static void DisplayMenu()
+    private static void DisplayMenu(AppSettings appSettings)
     {
         Console.WriteLine("Menu:");
         Console.WriteLine("1. Chat Mode");
         Console.WriteLine("2. Run Custsom Prompt");
         Console.WriteLine("\nX. Exit");
         Console.WriteLine();
+
+        Console.WriteLine("Prompt Directory:\t" + appSettings.PromptDirectory);
+        Console.WriteLine("Result Directory:\t" + appSettings.ResultDirectory);
+        Console.WriteLine("ChatGPT Model:\t\t" + appSettings.OpenAIModelID);
         Console.WriteLine();
     }
 
