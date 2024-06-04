@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace ChatgptAssistant
 {
@@ -19,6 +20,22 @@ namespace ChatgptAssistant
 
             AppSettings appSettings = new AppSettings(openAIModelId, openAIKey, promptDirectory, resultDirectory);
             return appSettings;
+        }
+
+        public static Task MessageOutputAsync(ChatHistory chatHistory)
+        {
+            var message = chatHistory.Last();
+
+            if (message.Role == AuthorRole.Assistant)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            }
+
+            Console.WriteLine($"{message.Role}:\n{message.Content}");
+            Console.ResetColor();
+            Console.WriteLine("------------------------");
+
+            return Task.CompletedTask;
         }
     }
 }

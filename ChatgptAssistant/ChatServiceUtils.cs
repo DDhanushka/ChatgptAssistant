@@ -6,39 +6,47 @@ public class ChatServiceUtils
 
     public static async Task StartChatAsync(IChatCompletionService chatGPT)
     {
-        Console.WriteLine("Chat content:");
-        Console.WriteLine("------------------------");
+        try
+        {
+            var chatHistory = new ChatHistory("You are a helpful assistant.");
 
-        var chatHistory = new ChatHistory("You are a librarian, expert about books");
+            while (true)
+            {
+                Console.WriteLine("Your message: ");
+                string? msg = Console.ReadLine();
 
-        // First user message
-        chatHistory.AddUserMessage("Hi, I'm looking for book suggestions");
-        await MessageOutputAsync(chatHistory);
+                // Check if the user wants to exit
+                if (msg?.ToLower() == "exit")
+                {
+                    chatHistory.AddUserMessage("Generate a title for this chat session.");
+                    var reply = await chatGPT.GetChatMessageContentAsync(chatHistory);
+                    chatHistory.Add(reply);
 
-        // First bot assistant message
-        var reply = await chatGPT.GetChatMessageContentAsync(chatHistory);
-        chatHistory.Add(reply);
-        await MessageOutputAsync(chatHistory);
+                    break;
+                }
 
-        // Second user message
-        chatHistory.AddUserMessage("I love history and philosophy, I'd like to learn something new about Greece, any suggestion");
-        await MessageOutputAsync(chatHistory);
+                if (!string.IsNullOrWhiteSpace(msg))
+                {
+                    // User sends msg
+                    chatHistory.AddUserMessage(msg);
 
-        // Second bot assistant message
-        reply = await chatGPT.GetChatMessageContentAsync(chatHistory);
-        chatHistory.Add(reply);
-        await MessageOutputAsync(chatHistory);
+                    // GPT sends reply
+                    var reply = await chatGPT.GetChatMessageContentAsync(chatHistory);
+                    chatHistory.Add(reply);
+                    await Utils.MessageOutputAsync(chatHistory);
+                }
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+
     }
 
-    private static Task MessageOutputAsync(ChatHistory chatHistory)
-    {
-        var message = chatHistory.Last();
 
-        Console.WriteLine($"{message.Role}: {message.Content}");
-        Console.WriteLine("------------------------");
-
-        return Task.CompletedTask;
-    }
 
 }
 
