@@ -1,4 +1,5 @@
 ﻿using ChatgptAssistant;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 public class Program
 {
@@ -7,6 +8,7 @@ public class Program
         Console.WriteLine("======== Chatgpt Assistant ========");
 
         AppSettings appSettings = Utils.GetAppSettings();
+        OpenAIChatCompletionService chatCompletionService = new(appSettings.OpenAIModelID, appSettings.OpenAIKey);
 
 
         while (true)
@@ -24,7 +26,7 @@ public class Program
             }
 
             // Process user input
-            ProcessUserInput(userInput);
+            await ProcessUserInput(userInput, chatCompletionService);
         }
     }
     private static void DisplayMenu(AppSettings appSettings)
@@ -41,12 +43,13 @@ public class Program
         Console.WriteLine();
     }
 
-    private static void ProcessUserInput(string? userInput)
+    private static async Task ProcessUserInput(string? userInput, OpenAIChatCompletionService chatService)
     {
         switch (userInput)
         {
             case "1":
                 Console.WriteLine("You selected: Chat Mode");
+                await ChatServiceUtils.StartChatAsync(chatService);
                 break;
             case "2":
                 Console.WriteLine("You selected: Custom Prompt");
