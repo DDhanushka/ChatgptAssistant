@@ -1,6 +1,7 @@
 ﻿using ChatgptAssistant.Templates;
 using Markdig;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 namespace ChatgptAssistant;
 public class ChatServiceUtils
@@ -91,7 +92,37 @@ public class ChatServiceUtils
 
     }
 
+    public static async Task RunCustomPrompt(IChatCompletionService chatGPT)
+    {
+        // Read the CustomePrompt.md
+        var promptPath = Path.Combine(Utils.GetAppSettings().PromptDirectory, "CustomPrompt.md");
+        var prompt = Utils.ReadFile(promptPath);
 
+        // Create the result directory with a uniqe name
+        var timeStamp = DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmssfff");
+        var uniqueResultDirectory = Path.Combine(Utils.GetAppSettings().ResultDirectory, $"{timeStamp}");
+        Directory.CreateDirectory(uniqueResultDirectory);
 
+        // Create a copy of the input prompt
+        var outputPath = Path.Combine(uniqueResultDirectory, $"{timeStamp}_CustomPrompt.md");
+        File.WriteAllText(outputPath, prompt);
+
+        // Start the chat session
+        Console.WriteLine("Chat content:");
+        Console.WriteLine("------------------------");
+
+        // System message
+        var chatHistory = new ChatHistory("You are an helpful assistant");
+        
+        // Submit the prompt to ChatGPT
+        chatHistory.AddUserMessage(prompt);
+        await Utils.MessageOutputAsync(chatHistory);
+
+        // Response from ChatGPT
+        var reply = await chatGPT.GetChatMessageContentAsync(chatHistory);
+        chatHistory.Add(reply);
+        await Utils.MessageOutputAsync(chatHistory);
+
+    }
 }
 

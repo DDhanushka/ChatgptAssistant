@@ -54,5 +54,18 @@ namespace ChatgptAssistant
                 Console.WriteLine($"An error occurred while opening file: {ex.Message}");
             }
         }
+
+        public static string ReadFile(string filePath)
+        {
+            try
+            {
+                return File.ReadAllText(filePath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error reading file: {ex.Message}");
+                return null;
+            }
+        }
     }
 }

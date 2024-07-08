@@ -53,6 +53,7 @@ public class Program
                 break;
             case "2":
                 Console.WriteLine("You selected: Custom Prompt");
+                await ChatServiceUtils.RunCustomPrompt(chatService);
                 break;
             default:
                 Console.WriteLine("Invalid choice. Please enter a number between 1 and 4, or 'X' to exit.");
