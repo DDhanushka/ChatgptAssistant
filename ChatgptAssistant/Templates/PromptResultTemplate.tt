@@ -1,0 +1,110 @@
+﻿<#@ output extension=".html" #>
+<#@ import namespace="ChatgptAssistant.Templates"#>
+
+<!DOCTYPE html>
+<html lang = "en" >
+<head>
+    <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>
+                <#= Title #>
+            </title>
+            <style>
+        /* Your CSS styles here */
+/* Reset default browser styles */
+body, h1, h2, h3, p {
+    margin: 0;
+    padding: 0;
+}
+
+/* Set body font and line height */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  background-color: #f9f9f9;
+  color: #333;
+  padding: 0 5em;
+}
+
+footer {
+  color: #979797;
+  font-size: 12px;
+  border-top: 1px solid #ddd;
+  text-align: center;
+}
+
+.markdown-content {
+  background-color: #fff;
+  padding: 20px;
+  min-width: 1080px;
+  margin: 0 auto;
+  box-shadow: 0 5px 5px #ddd;
+}
+
+code {
+    color: #333535;
+    background-color: #f5faff;
+    display: inline-block;
+    padding: .3em .5em;
+    border-radius: 5px;
+    border: 1px dashed #a5ccee;
+}
+
+/* Headings */
+h1, h2, h3 {
+    color: #4473a6; /* Blue headings */
+    margin-bottom: 10px;
+}
+
+/* Paragraphs */
+p {
+    margin-bottom: 15px;
+}
+
+/* Links */
+a {
+    color: #007bff; /* Blue links */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Lists */
+ul, ol {
+    margin-bottom: 15px;
+}
+
+/* Table */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd; /* Light gray bottom border */
+}
+
+th {
+    background-color: #007bff; /* Blue header background */
+    color: #fff; /* White text color */
+}
+        /* Add more styles as needed */
+    </style>
+</head>
+<body>
+<div Class="markdown-content">
+
+<#= Content #>
+
+<footer>
+    Generated With OpenAI ChatGPT API, Semantic library And .NET
+</footer>
+
+</div>
+
+</body>
+</html>

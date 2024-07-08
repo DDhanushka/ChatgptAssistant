@@ -94,18 +94,19 @@ public class ChatServiceUtils
 
     public static async Task RunCustomPrompt(IChatCompletionService chatGPT)
     {
+        /*
+         * Message Flow
+         * 
+         * 0. System message
+         * 1. Prompt
+         * 2. Response for prompt
+         * 3. Title prompt
+         * 4. Response for title prompt
+         */
+
         // Read the CustomePrompt.md
         var promptPath = Path.Combine(Utils.GetAppSettings().PromptDirectory, "CustomPrompt.md");
         var prompt = Utils.ReadFile(promptPath);
-
-        // Create the result directory with a uniqe name
-        var timeStamp = DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmssfff");
-        var uniqueResultDirectory = Path.Combine(Utils.GetAppSettings().ResultDirectory, $"{timeStamp}");
-        Directory.CreateDirectory(uniqueResultDirectory);
-
-        // Create a copy of the input prompt
-        var outputPath = Path.Combine(uniqueResultDirectory, $"{timeStamp}_CustomPrompt.md");
-        File.WriteAllText(outputPath, prompt);
 
         // Start the chat session
         Console.WriteLine("Chat content:");
@@ -113,7 +114,7 @@ public class ChatServiceUtils
 
         // System message
         var chatHistory = new ChatHistory("You are an helpful assistant");
-        
+
         // Submit the prompt to ChatGPT
         chatHistory.AddUserMessage(prompt);
         await Utils.MessageOutputAsync(chatHistory);
@@ -122,6 +123,33 @@ public class ChatServiceUtils
         var reply = await chatGPT.GetChatMessageContentAsync(chatHistory);
         chatHistory.Add(reply);
         await Utils.MessageOutputAsync(chatHistory);
+
+        // Generate a title
+        chatHistory.AddUserMessage("Generate a title for this chat session. Title should be able to use as a file name in windows OS. Don't use - and _ to seperate words. But spaces");
+        reply = await chatGPT.GetChatMessageContentAsync(chatHistory);
+        chatHistory.Add(reply);
+
+        // Extract the title and reply for the prompt
+        var gptResult = chatHistory[2]!.Content;
+        var title = chatHistory[4]!.Content!.Trim();
+
+        // Create the result directory with a uniqe name
+        var timeStamp = DateTimeOffset.UtcNow.ToString("yyyyMMddHHmmssfff");
+        var uniqueResultDirectory = Path.Combine(Utils.GetAppSettings().ResultDirectory, $"{title}_{timeStamp}");
+        Directory.CreateDirectory(uniqueResultDirectory);
+
+        // Create a copy of the input prompt
+        var outputPath = Path.Combine(uniqueResultDirectory, $"{timeStamp}_CustomPrompt.md");
+        File.WriteAllText(outputPath, prompt);
+
+        // Generate html from markdown
+        var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+        var htmlContent = Markdown.ToHtml(gptResult!, pipeline);
+        var promptResultTemplate = new PromptResultTemplate() { Content = htmlContent, Title = title };
+        var htmlResultPath = Path.Combine(uniqueResultDirectory, $"{title}_Result_{timeStamp}.html");
+        File.WriteAllText(htmlResultPath, promptResultTemplate.TransformText());
+
+        Utils.OpenFile(htmlResultPath);
 
     }
 }

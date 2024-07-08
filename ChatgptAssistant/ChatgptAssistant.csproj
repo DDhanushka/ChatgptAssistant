@@ -24,6 +24,10 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>ChatSessionTemplate.cs</LastGenOutput>
     </None>
+    <None Update="Templates\PromptResultTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>PromptResultTemplate.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +39,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>ChatSessionTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Templates\PromptResultTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PromptResultTemplate.tt</DependentUpon>
     </Compile>
   </ItemGroup>
 
