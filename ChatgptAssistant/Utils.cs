@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.SemanticKernel.ChatCompletion;
+using System.Diagnostics;
 
 namespace ChatgptAssistant
 {
@@ -36,6 +37,22 @@ namespace ChatgptAssistant
             Console.WriteLine("------------------------");
 
             return Task.CompletedTask;
+        }
+
+        public static void OpenFile(string path)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = path,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while opening file: {ex.Message}");
+            }
         }
     }
 }

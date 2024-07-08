@@ -1,4 +1,6 @@
-﻿using Microsoft.SemanticKernel.ChatCompletion;
+﻿using ChatgptAssistant.Templates;
+using Markdig;
+using Microsoft.SemanticKernel.ChatCompletion;
 
 namespace ChatgptAssistant;
 public class ChatServiceUtils
@@ -18,7 +20,8 @@ public class ChatServiceUtils
                 // Check if the user wants to exit
                 if (msg?.ToLower() == "exit")
                 {
-                    chatHistory.AddUserMessage("Generate a title for this chat session.");
+                    // Instruct ChatGPT to create a title for the chat
+                    chatHistory.AddUserMessage("Generate a title for this chat session. Title should be able to use as a file name in windows OS. Don't use - and _ to seperate words. But spaces");
                     var reply = await chatGPT.GetChatMessageContentAsync(chatHistory);
                     chatHistory.Add(reply);
 
@@ -35,8 +38,50 @@ public class ChatServiceUtils
                     chatHistory.Add(reply);
                     await Utils.MessageOutputAsync(chatHistory);
                 }
-
             }
+
+            // We use a dictionary to keep a track of messages sent by each role.
+            var messageDictionary = new Dictionary<Guid, ChatBubble>();
+            var markDigPipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+
+            foreach (var msg in chatHistory)
+            {
+                // Ignore initial system message
+                if (msg.Role == AuthorRole.System)
+                {
+                    continue;
+                }
+
+                // ChatGPT sends responses in Markdown format. We can convert them into HTML using MarkDig library
+                var htmlContent = Markdown.ToHtml(msg.Content!, markDigPipeline);
+                messageDictionary.Add(Guid.NewGuid(), new ChatBubble() { Message = htmlContent, Role = msg.Role.ToString() });
+            }
+
+            // Remove title generation message and reply so that they are not included in html output.
+            var keysToRemove = messageDictionary.Keys.TakeLast(2).ToList();
+            foreach (var key in keysToRemove)
+            {
+                messageDictionary.Remove(key);
+            }
+
+            // Last response from Chatgpt is the title for the chat session.
+            var chatTitle = chatHistory.Last().Content?.Replace('"', ' ').Trim();
+
+            // Pass message dictionary and title to the template
+            var chatSessionTemplate = new ChatSessionTemplate
+            {
+                ChatHistory = messageDictionary,
+                Title = chatTitle
+            };
+
+            // We can get the result directory from appsettings.json. User can change the directory as he wishes.
+            var resultDirecotoryPath = Utils.GetAppSettings().ResultDirectory;
+
+            var htmlPath = $"{resultDirecotoryPath}/{chatTitle}.html";
+            File.WriteAllText(htmlPath, chatSessionTemplate.TransformText());
+
+            // Open the saved html file with default browser.
+            Utils.OpenFile(htmlPath);
 
         }
         catch (Exception ex)

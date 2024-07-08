@@ -8,9 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Markdig" Version="0.37.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0-preview.4.24266.19" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0-preview.4.24266.19" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.2.0" />
+    <PackageReference Include="System.CodeDom" Version="8.0.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0-preview.4.24266.19" />
   </ItemGroup>
 
@@ -18,6 +20,22 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Templates\ChatSessionTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>ChatSessionTemplate.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Templates\ChatSessionTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ChatSessionTemplate.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>
